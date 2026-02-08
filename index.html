@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Pasifae · Pedidos</title>
+  <meta name="description" content="Registro rápido de pedidos Pasifae Skincare. Guarda pedidos y alimenta listas de clientes, productos y revistas." />
+
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#fbfaf8" />
+
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <a class="skip-link" href="#app">Saltar al contenido</a>
+
+  <header class="topbar">
+    <div class="container topbar__row">
+      <div class="brand" aria-label="Pasifae Pedidos">
+        <div class="brand__mark" aria-hidden="true"></div>
+        <div class="brand__txt">
+          <div class="brand__name">Pasifae</div>
+          <div class="brand__sub">Pedidos · v1</div>
+        </div>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="btn btn--ghost" id="btnRefresh" type="button" title="Recargar listas">Recargar</button>
+        <a class="btn btn--primary" id="btnOpenSheet" href="#" target="_blank" rel="noopener">Abrir Sheet</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="container">
+    <section class="hero" aria-label="Registro rápido">
+      <div class="hero__left">
+        <h1>Registrar pedido (rápido, sin sufrir) ✨</h1>
+        <p class="muted">
+          Guardas un pedido y automáticamente se actualizan las listas de <b>Clientes</b>, <b>Productos</b> y <b>Revistas</b>.
+        </p>
+
+        <div class="pillrow" aria-label="Estado del sistema">
+          <span class="pill" id="statusPill">Conectando…</span>
+          <span class="pill pill--soft" id="timePill">—</span>
+        </div>
+      </div>
+
+      <div class="hero__right card">
+        <form id="orderForm" autocomplete="off" novalidate>
+          <div class="grid">
+
+            <!-- Cliente -->
+            <div class="field">
+              <label for="cliente">Cliente</label>
+              <input
+                id="cliente"
+                name="cliente"
+                list="dlClientes"
+                placeholder="Ej: Laura Gómez"
+                required
+                autocomplete="name"
+                enterkeyhint="next"
+              />
+              <datalist id="dlClientes"></datalist>
+              <div class="hint" id="hintCliente">Tip: si ya existe, lo sugiero.</div>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="field">
+              <label for="whatsapp">WhatsApp</label>
+              <input
+                id="whatsapp"
+                name="whatsapp"
+                inputmode="tel"
+                placeholder="Ej: 3001112233"
+                autocomplete="tel"
+                enterkeyhint="next"
+              />
+              <div class="hint" id="hintWA">Con o sin +57, yo lo limpio.</div>
+            </div>
+
+            <!-- Producto -->
+            <div class="field field--wide">
+              <label for="producto">Producto</label>
+              <input
+                id="producto"
+                name="producto"
+                list="dlProductos"
+                placeholder="Ej: Sérum Niacinamida 10%"
+                required
+                enterkeyhint="next"
+              />
+              <datalist id="dlProductos"></datalist>
+            </div>
+
+            <!-- Cantidad -->
+            <div class="field">
+              <label for="cantidad">Cantidad</label>
+              <input
+                id="cantidad"
+                name="cantidad"
+                type="number"
+                min="1"
+                value="1"
+                required
+                inputmode="numeric"
+                enterkeyhint="next"
+              />
+            </div>
+
+            <!-- ✅ NUEVO: Precio unitario -->
+            <div class="field">
+              <label for="precioUnitario">Precio unitario</label>
+              <input
+                id="precioUnitario"
+                name="precioUnitario"
+                inputmode="numeric"
+                placeholder="Ej: 12000 o 12.000"
+                aria-describedby="hintPrecio"
+                spellcheck="false"
+                enterkeyhint="next"
+              />
+              <div class="hint" id="hintPrecio">Acepta 12000, 12.000 o $12.000</div>
+            </div>
+
+            <!-- Revista -->
+            <div class="field">
+              <label for="revista">Revista</label>
+              <input
+                id="revista"
+                name="revista"
+                list="dlRevistas"
+                placeholder="Ej: Natura"
+                required
+                enterkeyhint="next"
+              />
+              <datalist id="dlRevistas"></datalist>
+            </div>
+
+            <!-- Edición -->
+            <div class="field">
+              <label for="edicion">Edición</label>
+              <input
+                id="edicion"
+                name="edicion"
+                placeholder="Ej: Campaña 03 / Febrero"
+                enterkeyhint="next"
+              />
+            </div>
+
+            <!-- Página -->
+            <div class="field">
+              <label for="pagina">Página</label>
+              <input
+                id="pagina"
+                name="pagina"
+                inputmode="numeric"
+                placeholder="Ej: 12"
+                enterkeyhint="next"
+              />
+            </div>
+
+            <!-- Estado -->
+            <div class="field">
+              <label for="estado">Estado</label>
+              <select id="estado" name="estado">
+                <option value="Nuevo" selected>Nuevo</option>
+                <option value="Confirmado">Confirmado</option>
+                <option value="Pagado">Pagado</option>
+                <option value="Enviado">Enviado</option>
+                <option value="Entregado">Entregado</option>
+              </select>
+            </div>
+
+            <!-- Notas -->
+            <div class="field field--wide">
+              <label for="notas">Notas</label>
+              <textarea
+                id="notas"
+                name="notas"
+                rows="2"
+                placeholder="Dirección, tipo de piel, color, recordatorios…"
+                enterkeyhint="done"
+              ></textarea>
+
+              <!-- Mini hint visual: total estimado (solo UI, opcional) -->
+              <div class="hint" id="hintTotal">
+                Tip: El total se calcula con Cantidad × Precio unitario (y el backend lo guarda como histórico).
+              </div>
+            </div>
+
+            <!-- Vendedor -->
+            <div class="field">
+              <label for="vendedor">Vendedor</label>
+              <select id="vendedor" name="vendedor">
+                <option value="">—</option>
+                <option value="Alek">Alek</option>
+                <option value="Cata">Cata</option>
+              </select>
+            </div>
+
+            <!-- Guardar -->
+            <div class="field field--wide">
+              <button class="btn btn--primary btn--block" id="btnSave" type="submit">
+                Guardar pedido ✅
+              </button>
+              <div class="toast" id="toast" role="status" aria-live="polite"></div>
+            </div>
+
+          </div>
+        </form>
+
+        <div class="row row--between row--mt">
+          <button class="btn btn--ghost" id="btnClear" type="button">Limpiar</button>
+          <button class="btn btn--wa" id="btnWA" type="button" title="Abrir WhatsApp del cliente">WhatsApp</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-label="Últimos pedidos">
+      <div class="section__head">
+        <h2>Últimos pedidos</h2>
+        <p class="muted">Para verificar rápido que sí quedó guardado.</p>
+      </div>
+
+      <div class="card">
+        <div class="tablewrap">
+          <table class="table" aria-label="Tabla de últimos pedidos">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Revista</th>
+                <th>Pág.</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+
+            <tbody id="recentTbody">
+              <tr><td colspan="7" class="muted">Cargando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row row--between row--mt">
+          <button class="btn btn--ghost" id="btnLoadRecent" type="button">Refrescar últimos</button>
+          <span class="muted small" id="recentMeta">—</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span class="muted small">Pasifae · Pedidos v1 · Light-only (porque la vida ya se encarga del resto)</span>
+    </footer>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
